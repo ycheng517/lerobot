@@ -16,8 +16,62 @@ import logging
 from pprint import pformat
 
 from lerobot.common.robots import RobotConfig
+from lerobot.common.robots.register import ROBOT_FACTORIES
 
 from .robot import Robot
+
+_PLUGINS_DISCOVERED = False
+
+
+def register_robot_factory(robot_type: str, factory_func):
+    """Register a factory function for a robot type.
+
+    Args:
+        robot_type: The robot type identifier (e.g., "my_custom_robot")
+        factory_func: Function that takes a config and returns a Robot instance
+    """
+    ROBOT_FACTORIES[robot_type] = factory_func
+
+
+def discover_robot_plugins():
+    """Discover and load robot plugins using entry points (like pytest plugins)."""
+    global _PLUGINS_DISCOVERED
+
+    if _PLUGINS_DISCOVERED:
+        logging.info("Robot plugins already discovered, skipping.")
+        print("Robot plugins already discovered, skipping.")
+        return
+
+    try:
+        # Use importlib.metadata (Python 3.8+) or importlib_metadata for older versions
+        try:
+            from importlib.metadata import entry_points
+        except ImportError:
+            from importlib_metadata import entry_points
+
+        # Discover plugins through entry points
+        discovered_eps = entry_points()
+        print(f"Discovered entry points: {discovered_eps}")
+
+        # Look for 'lerobot.robots' entry points
+        robot_eps = discovered_eps.select(group="lerobot.robots")
+
+        for ep in robot_eps:
+            try:
+                # Load the plugin (this should trigger registration)
+                register_plugin_func = ep.load()
+                register_plugin_func()
+                print(f"Loaded robot plugin: {ep.name} from {ep.value}")
+            except Exception as e:
+                print(f"Failed to load robot plugin {ep.name}: {e}")
+
+    except Exception as e:
+        print(f"Plugin discovery failed: {e}")
+
+    _PLUGINS_DISCOVERED = True
+    print(
+        f"Discovered {ROBOT_FACTORIES} robot plugins: {', '.join(ROBOT_FACTORIES.keys()) if ROBOT_FACTORIES else 'None'}"
+    )
 
 
 def make_robot_from_config(config: RobotConfig) -> Robot:
@@ -53,12 +107,15 @@ def make_robot_from_config(config: RobotConfig) -> Robot:
         from tests.mocks.mock_robot import MockRobot
 
         return MockRobot(config)
+    elif config.type in ROBOT_FACTORIES:
+        return ROBOT_FACTORIES[config.type](config)
     else:
         raise ValueError(config.type)
 
 
 def ensure_safe_goal_position(
-    goal_present_pos: dict[str, tuple[float, float]], max_relative_target: float | dict[float]
+    goal_present_pos: dict[str, tuple[float, float]],
+    max_relative_target: float | dict[float],
 ) -> dict[str, float]:
     """Caps relative action target magnitude for safety."""
 
@@ -93,3 +150,6 @@ def ensure_safe_goal_position(
         )
 
     return safe_goal_positions
+
+
+discover_robot_plugins()

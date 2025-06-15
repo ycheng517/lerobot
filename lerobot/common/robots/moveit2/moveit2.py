@@ -56,13 +56,13 @@ class MoveIt2(Robot):
     @cached_property
     def action_features(self) -> dict[str, type]:
         return {
-            "linear_vel_x": float,
-            "linear_vel_y": float,
-            "linear_vel_z": float,
-            "angular_vel_x": float,
-            "angular_vel_y": float,
-            "angular_vel_z": float,
-            "gripper_pos": float,
+            "linear_x": float,
+            "linear_y": float,
+            "linear_z": float,
+            "angular_x": float,
+            "angular_y": float,
+            "angular_z": float,
+            "gripper": float,
         }
 
     @property
@@ -135,19 +135,19 @@ class MoveIt2(Robot):
             action = ensure_safe_goal_position(goal_present_vel, self.config.max_relative_target)
 
         linear_vel = (
-            action["linear_vel_x"],
-            action["linear_vel_y"],
-            action["linear_vel_z"],
+            action["linear_x"],
+            action["linear_y"],
+            action["linear_z"],
         )
         angular_vel = (
-            action["angular_vel_x"],
-            action["angular_vel_y"],
-            action["angular_vel_z"],
+            action["angular_x"],
+            action["angular_y"],
+            action["angular_z"],
         )
         self.moveit2_interface.servo(linear=linear_vel, angular=angular_vel)
 
-        gripper_pos = action["gripper_pos"]
-        self.moveit2_interface.send_gripper_command(gripper_pos)
+        gripper = action["gripper"]
+        self.moveit2_interface.send_gripper_command(gripper)
         return action
 
     def from_keyboard_to_action(self, pressed_keys: dict[str, Any]) -> dict[str, float]:
@@ -185,18 +185,18 @@ class MoveIt2(Robot):
         if "o" in pressed_keys:
             ang_vel_z -= 1.0
 
-        gripper_pos = 0.0
+        gripper = 0.0
         if "space" in pressed_keys:
-            gripper_pos = 1.0
+            gripper = 1.0
 
         return {
-            "linear_vel_x": lin_vel_x,
-            "linear_vel_y": lin_vel_y,
-            "linear_vel_z": lin_vel_z,
-            "angular_vel_x": ang_vel_x,
-            "angular_vel_y": ang_vel_y,
-            "angular_vel_z": ang_vel_z,
-            "gripper_pos": gripper_pos,
+            "linear_x": lin_vel_x,
+            "linear_y": lin_vel_y,
+            "linear_z": lin_vel_z,
+            "angular_x": ang_vel_x,
+            "angular_y": ang_vel_y,
+            "angular_z": ang_vel_z,
+            "gripper": gripper,
         }
 
     def disconnect(self):

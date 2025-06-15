@@ -49,5 +49,9 @@ def make_teleoperator_from_config(config: TeleoperatorConfig) -> Teleoperator:
         from .gamepad.teleop_gamepad import GamepadTeleop
 
         return GamepadTeleop(config)
+    elif config.type == "gamepad_6dof":
+        from .gamepad_6dof.teleop_gamepad_6dof import Gamepad6DOFTeleop
+
+        return Gamepad6DOFTeleop(config)
     else:
         raise ValueError(config.type)

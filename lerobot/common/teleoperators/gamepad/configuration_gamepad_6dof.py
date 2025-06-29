@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 # Copyright 2025 The HuggingFace Inc. team. All rights reserved.
 #
@@ -14,7 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .configuration_gamepad import GamepadTeleopConfig
-from .configuration_gamepad_6dof import GamepadTeleop6DOFConfig
-from .teleop_gamepad import GamepadTeleop
-from .teleop_gamepad_6dof import GamepadTeleop6DOF
+from dataclasses import dataclass
+
+from ..config import TeleoperatorConfig
+
+
+@TeleoperatorConfig.register_subclass("gamepad_6dof")
+@dataclass
+class GamepadTeleop6DOFConfig(TeleoperatorConfig):
+    use_gripper: bool = True

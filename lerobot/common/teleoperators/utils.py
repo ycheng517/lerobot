@@ -49,6 +49,10 @@ def make_teleoperator_from_config(config: TeleoperatorConfig) -> Teleoperator:
         from .gamepad.teleop_gamepad import GamepadTeleop
 
         return GamepadTeleop(config)
+    elif config.type == "gamepad_6dof":
+        from .gamepad.teleop_gamepad_6dof import GamepadTeleop6DOF
+
+        return GamepadTeleop6DOF(config)
     elif config.type == "keyboard_ee":
         from .keyboard.teleop_keyboard import KeyboardEndEffectorTeleop
 

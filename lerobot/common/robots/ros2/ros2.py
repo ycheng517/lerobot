@@ -106,7 +106,11 @@ class ROS2Robot(Robot):
         # Capture images from cameras
         for cam_key, cam in self.cameras.items():
             start = time.perf_counter()
-            obs_dict[cam_key] = cam.async_read()
+            try:
+                obs_dict[cam_key] = cam.async_read(timeout_ms=300)
+            except Exception as e:
+                logger.error(f"Failed to read camera {cam_key}: {e}")
+                obs_dict[cam_key] = None
             dt_ms = (time.perf_counter() - start) * 1e3
             logger.debug(f"{self} read {cam_key}: {dt_ms:.1f}ms")
 

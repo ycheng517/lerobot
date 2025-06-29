@@ -105,7 +105,6 @@ class GamepadController6DOF(InputController):
         # RT (right trigger) - down movement
         left_trigger = self.joystick.get_axis(2)  # LT
         right_trigger = self.joystick.get_axis(5)  # RT
-        print(f"Left Trigger: {left_trigger}, Right Trigger: {right_trigger}")
         # Convert trigger values from [-1, 1] to [0, 1] range
         left_trigger = (left_trigger + 1) / 2
         right_trigger = (right_trigger + 1) / 2
@@ -123,13 +122,13 @@ class GamepadController6DOF(InputController):
         # Calculate deltas
         # Linear movement
         linear_x = -left_x * self.x_step_size  # Forward/backward
-        linear_y = -left_y * self.y_step_size  # Left/right
+        linear_y = left_y * self.y_step_size  # Left/right
         linear_z = (right_trigger - left_trigger) * self.z_step_size  # Up/down
 
         # Angular movement
-        angular_x = -right_x * self.rot_step_size  # Roll
-        angular_y = -right_y * self.rot_step_size  # Pitch
-        angular_z = (right_bumper - left_bumper) * self.rot_step_size  # Yaw
+        angular_x = right_y * self.rot_step_size  # Roll
+        angular_y = right_x * self.rot_step_size  # Pitch
+        angular_z = (left_bumper - right_bumper) * self.rot_step_size  # Yaw
 
         return linear_x, linear_y, linear_z, angular_x, angular_y, angular_z
 

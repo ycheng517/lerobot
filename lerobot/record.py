@@ -59,12 +59,14 @@ from lerobot.common.robots import (  # noqa: F401
     RobotConfig,
     koch_follower,
     make_robot_from_config,
+    ros2,
     so100_follower,
     so101_follower,
 )
 from lerobot.common.teleoperators import (  # noqa: F401
     Teleoperator,
     TeleoperatorConfig,
+    gamepad,
     make_teleoperator_from_config,
 )
 from lerobot.common.utils.control_utils import (

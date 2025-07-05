@@ -163,7 +163,7 @@ class ROS2Interface:
         else:
             gripper_goal = position
 
-        self._goal_msg.command.position = gripper_goal
+        self._goal_msg.command.position = float(gripper_goal)
         if not (resp := self.gripper_action_client.send_goal(self._goal_msg)):
             logger.error("Failed to send gripper command")
             return False
